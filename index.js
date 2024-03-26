@@ -19,7 +19,11 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 //     // optionsSuccessStatus: 204,
 //   })
 // );
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://our-lady-of-fatima-university-virstual.onrender.com",
+  })
+);
 
 const dbUrl = process.env.DB;
 const PORT = process.env.PORT || 4000;
