@@ -9,14 +9,17 @@ const app = express();
 
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(
-  cors({
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    // preflightContinue: false,
-    // optionsSuccessStatus: 204,
-  })
-);
+// app.use(
+//   cors({
+//     origin:
+//       "https://our-lady-of-fatima-university-virstual.onrender.com" ||
+//       "http://localhost:3000",
+//     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     // preflightContinue: false,
+//     // optionsSuccessStatus: 204,
+//   })
+// );
+app.use(cors());
 
 const dbUrl = process.env.DB;
 const PORT = process.env.PORT || 4000;
