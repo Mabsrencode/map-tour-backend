@@ -4,19 +4,19 @@ const coordinateSchema = mongoose.Schema(
   {
     title: {
       type: String,
-      require: true,
+      required: true,
     },
     description: {
       type: String,
-      require: true,
+      required: true,
     },
-    image: {
-      type: String,
-      require: true,
+    images: {
+      type: [String], // Array of image strings
+      required: true,
     },
     location: {
       type: Object,
-      require: true,
+      required: true,
     },
   },
   { timestamps: true }

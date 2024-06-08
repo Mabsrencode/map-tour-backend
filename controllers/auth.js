@@ -1,53 +1,70 @@
-import dotenv from "dotenv";
-dotenv.config();
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-
+import bcrypt from "bcrypt";
 import User from "../models/user.js";
-const secretToken = process.env.REACT_APP_SECRET_TOKEN;
-export const signin = async (req, res) => {
-  const { email, password } = req.body;
+import createSecretToken from "../utils/createSecretToken.js";
+
+// Register a new user
+const register = async (req, res, next) => {
   try {
+    const { username, email, password } = req.body;
     const existingUser = await User.findOne({ email });
-    if (!existingUser)
-      return res.status(404).json({ message: "User doesn't exist." });
-    const isPasswordCorrect = await bcrypt.compare(
-      password,
-      existingUser.password
-    );
-    if (!isPasswordCorrect)
-      return res.status(400).json({ message: "Invalid Credentials." });
-    const token = jwt.sign(
-      { email: existingUser.email, id: existingUser._id },
-      secretToken,
-      { expiresIn: "1h" }
-    );
-    res.status(200).json({ result: existingUser, token });
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong." });
-  }
-};
-export const signup = async (req, res) => {
-  const { email, password, cpassword, firstName, lastName } = req.body;
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser)
-      return res.status(400).json({ message: "User already exist." });
-    if (password !== cpassword)
-      return res.status(400).json({ message: "Password doesn't match." });
-    const hashedPassword = await bcrypt.hash(password, 12);
-    const result = await User.create({
+    if (existingUser) {
+      return res.json({ message: "User already exists" });
+    }
+    const user = await User.create({
+      username,
       email,
-      password: hashedPassword,
-      name: `${firstName} ${lastName}`,
+      password,
     });
-    const token = jwt.sign(
-      { email: result.email, id: result._id },
-      secretToken,
-      { expiresIn: "1h" }
-    );
-    res.status(200).json({ result, token });
+    const token = createSecretToken(user._id.toString());
+    res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 60 * 60 * 1000,
+    });
+    res.status(201).json({ message: "Registration successful", user });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong." });
+    next(error);
   }
 };
+
+// Login with an existing user
+const login = async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.json({ message: "All fields are required" });
+    }
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    console.log(user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log(passwordMatch);
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+    const userData = {
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      _id: user._id,
+    };
+    const token = createSecretToken(user._id);
+    res.cookie("token", token, {
+      withCredentials: true,
+      httpOnly: false,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 60 * 60 * 1000,
+    });
+
+    res.status(201).json({ message: "Login successful", token, userData });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { register, login };
