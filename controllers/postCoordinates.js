@@ -49,27 +49,40 @@ export const createCoordinatesPin = async (req, res) => {
   }
 };
 
-// export const updateCoordinatesPin = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { title, description, images, location } = req.body;
-//     const updatedPin = await Coordinates.findByIdAndUpdate(
-//       id,
-//       { title, description, images, location },
-//       { new: true }
-//     );
-//     res.status(200).json(updatedPin);
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+export const updateCoordinatesPin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, images, location } = req.body;
+    const updatedPin = await Coordinates.findByIdAndUpdate(
+      id,
+      { title, description, images, location },
+      { new: true }
+    );
+    res.status(200).json(updatedPin);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
-// export const deleteCoordinatesPin = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     await Coordinates.findByIdAndDelete(id);
-//     res.status(200).json({ message: "Location deleted successfully" });
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+export const deleteCoordinatesPin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Coordinates.findByIdAndDelete(id);
+    res.status(200).json({ message: "Location deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const getAllSearch = async (req, res) => {
+  const { query } = req.query;
+  try {
+    const results = await Coordinates.find({
+      title: { $regex: new RegExp(query, "i") },
+    });
+    res.json(results);
+  } catch (error) {
+    console.error("Error searching:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
