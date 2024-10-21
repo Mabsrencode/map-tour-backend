@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.07e801e8.css",
+    "main.js": "/static/js/main.03990093.js",
+    "static/media/olfu-map.png": "/static/media/olfu-map.be2fbce840452de803da.png",
+    "static/media/hero-1.jpg": "/static/media/hero-1.46d0c31e805fc0302f78.jpg",
+    "static/media/olfu-program-logo.png": "/static/media/olfu-program-logo.55207391bab1325a710f.png",
+    "index.html": "/index.html",
+    "main.07e801e8.css.map": "/static/css/main.07e801e8.css.map",
+    "main.03990093.js.map": "/static/js/main.03990093.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.07e801e8.css",
+    "static/js/main.03990093.js"
+  ]
+}
