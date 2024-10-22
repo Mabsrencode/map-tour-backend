@@ -5,6 +5,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import cors from "cors";
+import cron from "node-cron";
 import cookieParser from "cookie-parser";
 import { fileURLToPath } from "url";
 import coordinates from "./routes/coordinates.routes.js";
@@ -16,7 +17,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -59,4 +60,17 @@ app.get("/*", (req, res) => {
 });
 // app.use("/user", userRoutes);
 
-app.listen(PORT, () => console.log(`Starting server on port ${PORT}`));
+const pingServer = () => {
+  http
+    .get("https://olfu-server.onrender.com", (res) => {
+      console.log("Pinged server, status code:", res.statusCode);
+    })
+    .on("error", (err) => {
+      console.error("Error pinging server:", err.message);
+    });
+};
+
+app.listen(PORT, () => {
+  cron.schedule("*/5 * * * *", pingServer);
+  console.log(`Starting server on port ${PORT}`);
+});
